@@ -1,0 +1,6 @@
+name = interzonas
+description = Desarrollo gestión de mapas de imagenes
+package = interzonas
+core = 7.x
+files[] = interzonas.module
+files[] = interzonas.install

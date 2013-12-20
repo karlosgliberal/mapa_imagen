@@ -1,0 +1,166 @@
+<?php
+
+/**
+ * @file
+ * Interzoans module.
+ */
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function interzonas_get_varialbles_mapa(){
+  $obj = new StdClass();
+  $node = node_load(1);
+  $obj->mapa = $node->field_mapa['und'][0];
+  $obj->img = $node->field_imagen['und'][0];
+  return $obj;
+}
+
+
+/**
+ * Implements hook_menu().
+ * Creamos un elemento de menu con su pagina
+ * para visualizar el mapa con los puntos
+ */
+function interzonas_menu(){
+  $items['mapa'] = array(
+      'title' => 'Mapa',
+      'description' => 'Mapa',
+      'page callback' => 'interzonas_mapa_page_callback',
+      'access callback' => TRUE,
+    );
+  return $items;
+}
+
+/**
+ * Implements hook_init()
+ * Para pasar datos fake al setting.
+ */
+function interzonas_init(){
+  $puntos = array(
+    'punto1' => array(
+      'long' => '51.490,', 'lat' => '-0.075'),
+    'punto2' => array(
+      'long' => '51.491,', 'lat' => '-0.074')
+    );
+ $nodo = node_load(1);
+ drupal_add_js(array('interzonas' => array('campo_mapa' => $nodo->field_mapa['und'][0], 'campo_img' => $nodo->field_imagen['und'][0])), 'setting');
+ drupal_add_js(array('interzonas' => array('puntos' => $puntos)), 'setting');
+}
+
+
+/**
+ * callback ara la paginia
+ */
+function interzonas_mapa_page_callback(){
+  $output = '';
+  $datos_mapa = interzonas_get_varialbles_mapa();
+  $output .= theme('mapa', array('datos_mapa'=>$datos_mapa));
+  return $output;
+}
+
+/**
+ * Implements theme.
+ */
+function interzonas_theme(){
+  return array(
+      'mapa' => array(
+        'variables' => array(
+          'datos_mapa' => NULL
+        )
+      )
+    );
+}
+
+
+/**
+ * Implements theme del mapa.
+ */
+function theme_mapa($datos_mapa){
+  drupal_add_js(drupal_get_path('module', 'interzonas').'/leaflet/leaflet.js');
+  drupal_add_css(drupal_get_path('module', 'interzonas').'/leaflet/leaflet.css');
+  drupal_add_js(drupal_get_path('module', 'interzonas').'/interzonas.drupal.js');
+  $output = '';
+  $output = '<div id="mapa" style="width: 700px; height: 500px; position: relative;"></div>';
+  return $output;
+}
+
+
+/**
+ * Implements hook_field_info().
+ */
+function interzonas_field_info() {  
+  return array(  
+    'campo_mapa' => array(  
+      'label' => t('Map field'),  
+      'description' => t('Map'),  
+      'default_widget' => 'mapa_widget',                        
+      'default_formatter' => 'mapa_formatter',  
+    ), 
+  ); 
+} 
+ 
+/**
+ * Implements hook_field_widget_info().
+ */
+function interzonas_field_widget_info() {  
+  return array(   
+    'mapa_widget' => array(  
+      'label' => t('Mapa'),  
+    'field types' => array('campo_mapa'),  
+    ), 
+  ); 
+} 
+   
+/**
+ * Implements hook_field_formatter_info().
+ */
+function interzonas_field_formatter_info() {  
+  return array(   
+      'mapa_formatter' => array(  
+          'label' => t('Mapa formatter'),  
+          'field types' => array('campo_mapa'),  
+      ), 
+  ); 
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function interzonas_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  
+  $value = isset($items[$delta]['campo_mapa']) ? $items[$delta]['campo_mapa'] : '';
+  $widget = $element;
+  $widget['#delta'] = $delta;
+  switch ($instance['widget']['type']) {  
+    case 'mapa_widget':  
+      $widget += array(
+          '#type' => 'hidden',  
+          '#title' => $element['#title'],  
+          '#description' => $element['#description'], 
+          '#default_value' => $value,  
+          '#required' => $element['#required'],  
+          '#weight' => isset($element['#weight']) ? $element['#weight'] : 0, 
+          '#delta' => $delta,
+          '#suffix' => '<div id="mapa" style="width: 700px; height: 500px; position: relative;"></div>',
+          '#attributes' => array('class' => array('interzonas-mapa')),
+          '#attached' => array(
+            'js' => array(drupal_get_path('module', 'interzonas') . '/interzonas_field.drupal.js', drupal_get_path('module', 'interzonas') . '/leaflet/leaflet.js'),
+            'css' => array(drupal_get_path('module', 'interzonas') . '/leaflet/leaflet.css'),
+        ),  
+      );
+    break; 
+  }
+  $element['campo_mapa'] = $widget;
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function interzonas_field_is_empty($item, $field) { 
+   if (empty($item['campo_mapa'])) { 
+        return TRUE;  
+   } 
+}

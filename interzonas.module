@@ -43,9 +43,14 @@ function interzonas_init(){
     'punto2' => array(
       'long' => '51.491,', 'lat' => '-0.074')
     );
- $nodo = node_load(1);
- drupal_add_js(array('interzonas' => array('campo_mapa' => $nodo->field_mapa['und'][0], 'campo_img' => $nodo->field_imagen['und'][0])), 'setting');
- drupal_add_js(array('interzonas' => array('puntos' => $puntos)), 'setting');
+
+  $node = menu_get_object('node',1,NULL);
+
+  if($node):
+ 
+    drupal_add_js(array('interzonas' => array('campo_mapa' => $nodo->field_mapa['und'][0], 'campo_img' => $nodo->field_imagen['und'][0])), 'setting');
+    drupal_add_js(array('interzonas' => array('puntos' => $puntos)), 'setting');
+  endif; 
 }
 
 

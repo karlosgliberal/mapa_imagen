@@ -3,10 +3,15 @@
   Drupal.behaviors.leafletMapField = {
     attach:function (context, settings) {
 
-    var map = L.map('map', {maxZoom: 17}).setView([51.495, -0.075], 14);
+
+    var latitude = Drupal.settings.leaflet_map_field.lat; 
+    var longitude = Drupal.settings.leaflet_map_field.lon;
+
+
+    var map = L.map('field_map', {maxZoom: 17}).setView([51.495, -0.075], 14);
     var marker;
-    var imageUrl = Drupal.settings.park_map; //'/sites/default/files/TM_pano.jpg';
-    var imageBounds = [[51.490, -0.122], [51.510, -0.028]];
+    var imageUrl = Drupal.settings.leaflet_map_field.image_path; //'/sites/default/files/TM_pano.jpg';
+    var imageBounds =[[51.490, -0.122], [51.510, -0.028]];
     L.imageOverlay(imageUrl, imageBounds).addTo(map);
 
 

@@ -158,7 +158,12 @@ function leaflet_map_field_field_widget_form(&$form, &$form_state, $field, $inst
   $widget['#delta'] = $delta;
   switch ($instance['widget']['type']) {  
     case 'field_coordinates_values':  
-      drupal_add_js( array('park_map' => $image_path), 'setting');
+
+      $newvalue = new stdClass;
+      $newvalue->image_path = $image_path;
+
+      drupal_add_js( array('leaflet_map_field' => $newvalue), 'setting');
+
       $widget += array(
           '#type' => 'hidden',  
           '#title' => $element['#title'],  
@@ -167,13 +172,10 @@ function leaflet_map_field_field_widget_form(&$form, &$form_state, $field, $inst
           '#required' => $element['#required'],  
           '#weight' => isset($element['#weight']) ? $element['#weight'] : 0, 
           '#delta' => $delta,
-          '#suffix' => '<div id="map" style="width: 700px; height: 500px; position: relative;"></div>',
+          '#suffix' => '<div id="field_map" style="width: 700px; height: 500px; position: relative;"></div>',
           '#attributes' => array('class' => array('leaf-map-field')),
           '#attached' => array(
-            'js' => array(drupal_get_path('module', 'leaflet_map_field') . '/js/leaflet_map_field.drupal.js'
-              //, drupal_get_path('module', 'interzonas') . '/leaflet/leaflet.js'
-            ),
-           // 'css' => array(drupal_get_path('module', 'interzonas') . '/leaflet/leaflet.css'),
+            'js' => array(drupal_get_path('module', 'leaflet_map_field') . '/js/leaflet_map_field.drupal.js')
         ),  
       );
     break; 

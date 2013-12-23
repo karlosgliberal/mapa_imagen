@@ -1,0 +1,16 @@
+<?php
+/**
+ * Implements hook_field_schema().
+ */
+function leaflet_map_field_field_schema($field) {  
+  // Return array that contains.
+  return array(                  
+    'columns' => array(           
+      // In column there is a textf field.
+      'leaflet_coordinates' => array(          
+        // Field has text type.
+        'type' => 'text',       
+      ), 
+    ), 
+  ); 
+}

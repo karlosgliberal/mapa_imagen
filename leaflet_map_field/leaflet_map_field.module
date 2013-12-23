@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @file 
+ *
+ * Standar drupal module to load all the files, and the print the required hooks.
+ */
+
+// Router file  holds the hook_menu, hook_permissions, and *_path_* hooks
+// module_load_include('inc','interactive_map_field','interactive_map_field.router');
+
+// field file holds all the required hooks to build fields.
+module_load_include('inc','leaflet_map_field','leaflet_map_field.field');
+
+// inc file holds all the new functions.
+module_load_include('inc','leaflet_map_field','leaflet_map_field');
+
+// theme file holds all the required hoos to theming elements
+module_load_include('inc','leaflet_map_field','leaflet_map_field.theme');
+
+
+
+/**
+ * Implement Hook_page_alter().
+ */
+function leaflet_map_field_page_alter(&$page) {
+
+  // load leaflet library and css.
+  if (($library = libraries_load('leaflet')) && !empty($library['loaded'])) {
+    libraries_load('leaflet');
+  }
+
+  $path = $library['library path']. '/leaflet.css';
+  
+  if(file_exists($path)) {
+
+    drupal_add_css($path, array('group' => CSS_DEFAULT, 'every_page' => TRUE));
+  }
+}

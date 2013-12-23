@@ -1,0 +1,8 @@
+name = Leaflet map field
+description = a new kind o field to take coordinates or pixels from leaflet map layer
+core = 7.x
+package = Fields
+
+dependencies[] = field_ui
+dependencies[] = leaflet
+

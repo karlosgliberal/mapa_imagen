@@ -8,6 +8,18 @@
  * Implements hook_variable_info().
  */
 function variable_example_variable_info($options) {
+  // Upload file.
+  $variables['variable_example_upload_file'] = array(
+    'type'              => 'upload_file',
+    'title'             => t('My Upload File', array(), $options),
+    'description'       => t('Upload my config file.', array(), $options),
+    'upload_location'   => 'public://myuploaddir',
+    'upload_validators' => array(
+      'file_validate_extensions' => array('gif png jpg jpeg'),
+    ),
+    'group'             => 'variable_example',
+  );
+
   // Simple text
   $variables['variable_example_text'] = array(
     'type' => 'text',

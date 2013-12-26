@@ -118,6 +118,26 @@ function interzonas_field_widget_info() {
 } 
    
 /**
+ * Implements hook_field_settings_form().
+ */
+function interzonas_field_settings_form($field, $instance, $has_data) {
+
+  dpm($field);
+
+  $form[$field['field_name']] = array(
+    '#title' => t('Default map image'),
+    '#description' => t('Add the default image/map for this field instance'),
+    '#type' => 'managed_file',
+    '#default_value' => ($field['settings']) ? $field['settings'][$field['field_name']] :  '' ,
+    '#upload_location' => 'public://multipurpose_field_images/',
+  );
+
+  return $form;
+
+}
+
+
+/**
  * Implements hook_field_formatter_info().
  */
 function interzonas_field_formatter_info() {  
@@ -134,11 +154,22 @@ function interzonas_field_formatter_info() {
  */
 function interzonas_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   
+  $image_path = '';
+  $fid = $field['settings'][$field['field_name']] ;
+
+  if($fid):
+    $image = file_load($fid);
+     if($image):
+        $image_path = file_create_url($image->uri);
+     endif;
+  endif;
+
   $value = isset($items[$delta]['campo_mapa']) ? $items[$delta]['campo_mapa'] : '';
   $widget = $element;
   $widget['#delta'] = $delta;
   switch ($instance['widget']['type']) {  
     case 'mapa_widget':  
+      drupal_add_js( array('park_map' => $image_path), 'setting');
       $widget += array(
           '#type' => 'hidden',  
           '#title' => $element['#title'],  

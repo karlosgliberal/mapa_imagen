@@ -163,7 +163,26 @@ function variable_variable_type_info() {
     'default callback' => 'variable_text_format_default',
     'localize' => TRUE,
   );
+  $type['upload_file'] = array(
+    'title'          => t('Upload File'),
+    'element'        => array('#type' => 'managed_file'),
+    'build callback' => 'variable_build_upload_file',
+    'token'          => TRUE,
+  );
   return $type;
+}
+
+/**
+ * Build upload file variable.
+ */
+function variable_build_upload_file($variable, $options) {
+  if (isset($variable['upload_validators'])) {
+    $variable['element']['#upload_validators'] = $variable['upload_validators'];
+  }
+  $variable['element']['#upload_location'] = isset($variable['upload_location']) ? $variable['upload_location'] : 'public://vfile';
+  $variable['element']['#theme'] = array('file_managed_file__variable_file');
+
+  return $variable;
 }
 
 /**
@@ -200,7 +219,7 @@ function variable_format_options($variable, $options = array()) {
   if (isset($variable['value']) && $variable['value']) {
     if (is_array($variable['value'])) {
       foreach ($variable['value'] as $index => $value) {
-         $names[$index] = isset($variable['options'][$value]) ? $variable['options'][$value] : '<' . t('Invalid option') . '>';
+        $names[$index] = isset($variable['options'][$value]) ? $variable['options'][$value] : '<' . t('Invalid option') . '>';
       }
       return implode(', ', $names);
     }

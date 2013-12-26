@@ -30,7 +30,8 @@ function park_map_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('variable_group_form', 'park_map_configuration'),
     'access arguments' => array('administer site configuration'),
-    'type' => MENU_DEFAULT_LOCAL_TASK
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'park_map.router.inc',
   );
 
   $items['admin/config/system/park_configuration/options'] = array(

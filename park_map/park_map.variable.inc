@@ -33,7 +33,7 @@ function park_map_variable_info($options) {
     'type' => 'options',
     'title' => t('Select the node bundles to use', array(), $options),
     'options' => $list_bundles,
-    'default' => '',
+    // 'default' => '',
     'description' => t('Choose the node types to use in the interactive map.', array(), $options),
     'required' => FALSE,
     'group' => 'park_map_options',
@@ -57,7 +57,7 @@ function park_map_variable_info($options) {
   $variables['park_map_southwest_latlong'] = array(
     'type' => 'string',
     'title' => t('SouthWest Latitude', array(), $options),
-    'default' => '',
+   // 'default' => '',
     'description' => t('Write the SouthWest Latitude  Longitude for the park-map location fsafsafsaf.', array(), $options),
     'required' => TRUE,
     'group' => 'park_map_configuration',
@@ -66,13 +66,15 @@ function park_map_variable_info($options) {
   $variables['park_map_northeast_latlong'] = array(
     'type' => 'string',
     'title' => t('NorthEast Latitude', array(), $options),
-    'default' => '',
+   // 'default' => '',
     'description' => t('Write the NorthEast Latitude Longitude for the park-map location.', array(), $options),
     'required' => TRUE,
     'group' => 'park_map_configuration',
   );
 
+// configurations of field by content type.
 
+  
 
   return $variables;
 }

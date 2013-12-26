@@ -1,0 +1,11 @@
+name = Park map
+description = Interactive park map.
+core = 7.x
+
+; dependencies[] = geolocation
+dependencies[] = variable
+dependencies[] = leaflet
+
+scripts[] = js/park_map.js
+
+configure = admin/config/system/park_configuration

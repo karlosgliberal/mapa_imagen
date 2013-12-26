@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file Install file
+ */
+function park_map_requirements($phase){
+
+  $requirements = array();
+
+  if($phase == 'runtime'):
+    $t = get_t();
+
+    $map = variable_get_value('park_map_image');
+    
+    if(!$map):
+      $requirements['park_map_image'] = array(
+        'title' => $t('Map Upload'), 
+        'value' => $t('Not Found'), 
+        'severity' => REQUIREMENT_ERROR, 
+        'description' => $t('You must upload an image in <a href="!url">configuration options</a>', array('!url' => url('admin/config/system/park_configuration'))),
+      );
+    endif;
+
+    $elements = array(
+      'park_map_southwest_latlong', 
+
+      'park_map_northeast_latlong',
+      );
+
+    foreach ($elements as $element) {
+
+      $value = variable_get_value($element);
+
+      if (!$value):
+        $requirements[$element] = array(
+          'title' => $t('Add ' . $element ),
+          'value' => $t('Not Found'),
+          'severity' => REQUIREMENT_ERROR,
+          'description' =>  $t('You must add !element coordinates in  <a href="!url">configuration options</a>', 
+            array('!url' => url('admin/config/system/park_configuration'), '!element' => $element)),
+        );
+      endif;
+    }
+
+  endif;
+
+  return $requirements;
+}

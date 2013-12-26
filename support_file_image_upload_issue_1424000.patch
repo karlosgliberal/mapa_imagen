@@ -1,0 +1,220 @@
+From 5b9f90cd945ac26d5ce386f3b6f0f8117a3c90ea Mon Sep 17 00:00:00 2001
+From: flashvnn <flashvnn@gmail.com>
+Date: Sat, 24 Aug 2013 22:10:55 +0700
+Subject: [PATCH] Add support file/image upload
+
+---
+ variable.module                                | 92 ++++++++++++++++++++++++++
+ variable.tokens.inc                            |  2 +-
+ variable.variable.inc                          | 21 +++++-
+ variable_example/variable_example.variable.inc | 12 ++++
+ 4 files changed, 125 insertions(+), 2 deletions(-)
+
+diff --git a/variable.module b/variable.module
+index 86e14c2..fc75976 100644
+--- a/variable.module
++++ b/variable.module
+@@ -4,6 +4,8 @@
+  * Variable API module
+  */
+ 
++require_once __DIR__ . "/variable.form.inc";
++
+ /**
+  * Implementation of hook_boot()
+  *
+@@ -11,6 +13,7 @@
+  * for other modules (like variable_realm) to be able to use the API
+  */
+ function variable_boot() {
++
+ }
+ 
+ /**
+@@ -535,6 +538,9 @@ function variable_theme($existing, $type, $theme, $path) {
+       'render element' => 'element',
+       'file' => 'variable.form.inc',
+     ),
++    'file_managed_file__variable_file' => array(
++      'render element' => 'element',
++    ),
+   );
+ }
+ 
+@@ -761,6 +767,7 @@ function variable_settings_form($form, $options = array()) {
+  * add an array_filter value to your form.
+  */
+ function variable_settings_form_submit($form, &$form_state) {
++  variable_process_upload_file_submit($form, $form_state);
+   // Exclude unnecessary elements.
+   form_state_values_clean($form_state);
+   // This may contain some realm options.
+@@ -798,3 +805,88 @@ function variable_invoke_all() {
+   }
+   return $return;
+ }
++
++/**
++ * Remove old file with element key.
++ *
++ * @param string $element_key
++ *   An associative string of variable name.
++ */
++function _variable_upload_file_remove_old_file($element_key) {
++  $fid = variable_get_value($element_key);
++  $file = $fid ? file_load($fid) : FALSE;
++  if ($file) {
++    file_usage_delete($file, 'variable_file', 'variable_file', 1);
++    file_delete($file);
++  }
++}
++
++/**
++ * Handle variable settings form submit for managed_file type.
++ */
++function variable_process_upload_file_submit($form, &$form_state){
++  global $user;
++  foreach (element_children($form) as $element_key) {
++    if ($form[$element_key]['#type'] == 'managed_file') {
++      if (is_numeric($form_state['values'][$element_key]) && $form_state['values'][$element_key] > 0) {
++        $file = file_load($form_state['values'][$element_key]);
++        if ($file && !$file->status) {
++          // Remove old file.
++          _variable_upload_file_remove_old_file($element_key);
++          $file->status = FILE_STATUS_PERMANENT;
++          file_save($file);
++          file_usage_add($file, 'variable_file', 'variable_file', $user->uid);
++        }
++      }
++      else {
++        _variable_upload_file_remove_old_file($element_key);
++      }
++    }
++  }
++}
++
++
++/**
++ * Custom theme for managed_file to display thumbnail image.
++ *
++ * @param array $variables
++ *   An associative array containing:
++ *   - element: A render element representing the file.
++ *
++ * @return string
++ *   Return markup of custom managed_file for variable file.
++ */
++function theme_file_managed_file__variable_file($variables) {
++  $element = $variables['element'];
++  $thumbnail = '';
++  if ($element['fid']['#value'] != 0) {
++    $_file = file_load($element['fid']['#value']);
++    if ($_file->filemime == 'image/jpeg') {
++      $thumbnail = theme('image_style', array(
++          'style_name' => 'thumbnail',
++          'path'       => $_file->uri,
++          'getsize'    => FALSE,
++        )
++      );
++    }
++  }
++  $attributes = array();
++  if (isset($element['#id'])) {
++    $attributes['id'] = $element['#id'];
++  }
++  if (!empty($element['#attributes']['class'])) {
++    $attributes['class'] = (array) $element['#attributes']['class'];
++  }
++  $attributes['class'][] = 'form-managed-file';
++
++  // This wrapper is required to apply JS behaviors and CSS styling.
++  $output = '';
++  $output .= '<div' . drupal_attributes($attributes) . '>';
++  $output .= drupal_render_children($element);
++  $output .= '</div>';
++  if (!empty($thumbnail)) {
++    $output = '<div class="variable_file">' . $thumbnail . $output . "</div>";
++  }
++
++  return $output;
++}
+diff --git a/variable.tokens.inc b/variable.tokens.inc
+index 57b39aa..e316750 100644
+--- a/variable.tokens.inc
++++ b/variable.tokens.inc
+@@ -48,4 +48,4 @@ function variable_tokens($type, $tokens, array $data = array(), array $options =
+   }
+ 
+   return $replacements;
+-}
+\ No newline at end of file
++}
+diff --git a/variable.variable.inc b/variable.variable.inc
+index d03679e..241618d 100644
+--- a/variable.variable.inc
++++ b/variable.variable.inc
+@@ -163,10 +163,29 @@ function variable_variable_type_info() {
+     'default callback' => 'variable_text_format_default',
+     'localize' => TRUE,
+   );
++  $type['upload_file'] = array(
++    'title'          => t('Upload File'),
++    'element'        => array('#type' => 'managed_file'),
++    'build callback' => 'variable_build_upload_file',
++    'token'          => TRUE,
++  );
+   return $type;
+ }
+ 
+ /**
++ * Build upload file variable.
++ */
++function variable_build_upload_file($variable, $options) {
++  if (isset($variable['upload_validators'])) {
++    $variable['element']['#upload_validators'] = $variable['upload_validators'];
++  }
++  $variable['element']['#upload_location'] = isset($variable['upload_location']) ? $variable['upload_location'] : 'public://vfile';
++  $variable['element']['#theme'] = array('file_managed_file__variable_file');
++
++  return $variable;
++}
++
++/**
+  * Build multiple mail variable
+  */
+ function variable_build_mail_text($variable, $options = array()) {
+@@ -200,7 +219,7 @@ function variable_format_options($variable, $options = array()) {
+   if (isset($variable['value']) && $variable['value']) {
+     if (is_array($variable['value'])) {
+       foreach ($variable['value'] as $index => $value) {
+-         $names[$index] = isset($variable['options'][$value]) ? $variable['options'][$value] : '<' . t('Invalid option') . '>';
++        $names[$index] = isset($variable['options'][$value]) ? $variable['options'][$value] : '<' . t('Invalid option') . '>';
+       }
+       return implode(', ', $names);
+     }
+diff --git a/variable_example/variable_example.variable.inc b/variable_example/variable_example.variable.inc
+index 1510839..d3e6a36 100644
+--- a/variable_example/variable_example.variable.inc
++++ b/variable_example/variable_example.variable.inc
+@@ -8,6 +8,18 @@
+  * Implements hook_variable_info().
+  */
+ function variable_example_variable_info($options) {
++  // Upload file.
++  $variables['variable_example_upload_file'] = array(
++    'type'              => 'upload_file',
++    'title'             => t('My Upload File', array(), $options),
++    'description'       => t('Upload my config file.', array(), $options),
++    'upload_location'   => 'public://myuploaddir',
++    'upload_validators' => array(
++      'file_validate_extensions' => array('gif png jpg jpeg'),
++    ),
++    'group'             => 'variable_example',
++  );
++
+   // Simple text
+   $variables['variable_example_text'] = array(
+     'type' => 'text',
+-- 
+1.8.0.msysgit.0
+

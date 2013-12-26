@@ -1,5 +1,6 @@
 <?php
 
+
 /**
  * @file
  */
@@ -12,38 +13,15 @@ function print_park_map() {
   $values = new stdClass;
 
   // get the image path
-  $image_cache = cache_get('park-map:image');
+  $values->image_absolute_path = _park_map_load_image_map_url();
+  
+  // get the geolocation values:
+  $values->geolocation  =  _park_map_load_map_geolocation();
 
-  if(!$image_cache) {
+  // get all the cotent types and all the fields from every content type.
+  $values->contents =  _park_map_load_content_options();
 
-    $image  = file_load(variable_get_value('park_map_image'));
-    if($image):
-      $image_path = file_create_url($image->uri);
-      $values->image_absolute_path = $image_path;
-      cache_set('park-map:image', $image_path);
-    endif; 
-  } else {
-    $values->image_absolute_path = $image_cache->data;
-  }
 
-  // get the latitude and logitudes values AKA geolocation
-  // they are 4 values, 2 values for northEast and and another two for southWest
-  $geolocation_cache = cache_get('park-map:positions');
-
-  if(!$geolocation_cache) {
-
-    $geolocation = new stdClass;
-    $geolocation->southwet_llatlong = variable_get_value('park_map_southwest_latlong');
-    $geolocation->northeast_latlong = variable_get_value('park_map_northeast_latlong');
-    
-    $values->geolocation = $geolocation;
-    cache_set('park-map:geolocation', $geolocation);
-
-  } else {
-    $values->geolocation = $geolocation_cache->data;
-  }
-
-//  $settings = array(    'image_path' => $values->image_absolute_path,   );
 
   drupal_add_js( array('park_map' => $values), 'setting');
 

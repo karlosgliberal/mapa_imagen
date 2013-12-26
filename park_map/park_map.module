@@ -1,12 +1,13 @@
 <?php
 
+module_load_include('inc','park_map','park_map.inc');
 module_load_include('inc','park_map','park_map.router');
 module_load_include('inc','park_map','park_map.theme');
 module_load_include('inc','park_map','park_map.page');
 module_load_include('inc','park_map','park_map.admin');
 module_load_include('inc','park_map','park_map.variable');
 //module_load_include('inc','park_map','park_map.class');
-module_load_include('inc','park_map','park_map.inc');
+
 
 
 /**

@@ -17,7 +17,7 @@ function park_map_menu() {
   $items = array();
 
   $items['admin/config/system/park_configuration'] = array(
-    'title' => 'Basic configuration',
+    'title' => 'Park Map configuration',
     'description' => 'Select the elements to pass to js',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('variable_group_form', 'park_map_configuration'),

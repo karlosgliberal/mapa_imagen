@@ -34,22 +34,23 @@ function _park_map_list_bundles() {
   * $values is an array with diferente options. This value can from variable_get('park_map_bundle', NULL)
   *
   * @return
-  * 0 is there is nothing or a number if there are bundles selected.
+  *  Null si no hay nada seleccoinado o un Array con los elementos.
   */
 
 function _park_map_bundles_selected ($values) {
 
-  if(!is_array($values)){
+  if(!is_array($values)) {
     return NULL;
   }
+  
+  $type = array();
 
-  $a = 0;
   foreach ($values as $value) {
-
-    $a += ($value)? 1 :  0 ;
+    if($value){
+      $type[] =$value;
+    }
   }
-
-  return $a;
+  return $type;
 }
 
 
@@ -98,12 +99,12 @@ function _park_map_load_map_geolocation() {
 
     $geolocation->southwet_latlong = variable_get_value('park_map_southwest_latlong');
     if(!$geolocation->southwet_latlong){
-      watchdog('Park Map', 'park_map_southwest_latlong variable is empty', $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);
+      watchdog(WATCHDOG_PARK_MAP_TYPE, 'park_map_southwest_latlong variable is empty', $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);
     }
 
     $geolocation->northeast_latlong = variable_get_value('park_map_northeast_latlong');
     if(!$geolocation->northeast_latlong){
-      watchdog('Park Map', 'park_map_northeast_latlong variable is empty', $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);
+      watchdog(WATCHDOG_PARK_MAP_TYPE, 'park_map_northeast_latlong variable is empty', $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);
     }
 
     cache_set('park-map:geolocation', $geolocation);
@@ -119,43 +120,51 @@ function _park_map_load_map_geolocation() {
  */
 function _park_map_load_content_options(){
 
-// Get the list of bundles.
-$bundles = variable_get_value('park_map_bundle');
+  // Get the list of bundles.
 
-if($bundles) {
-  $nodes = field_info_bundles('node');
-  $content = array();
-  // Check the bundles to know how were selected.
-  foreach ($bundles as $bundle) {
+  $contents = cache_get('park-map:options');
 
-    // if the bundle is seleceted.
-    if($bundle){
+  if(!$contents){
+    $bundles = variable_get_value('park_map_bundle');
 
-      // get the machine name
-      $content[$bundle]['machinename'] = $bundle;
-      // get the public name
-      $content[$bundle]['publicname'] = $nodes[$bundle]['label'];
+    if($bundles) {
+      $nodes = field_info_bundles('node');
+      $content = array();
+      // Check the bundles to know how were selected.
+      foreach ($bundles as $bundle) {
 
-      // get the fields:
-      $bundle_fields = variable_get_value('park_map_fields_' .  $bundle);
+        // if the bundle is seleceted.
+        if($bundle){
 
-      foreach ($bundle_fields as $field) {
-        
-        if($field) {          
+          // get the machine name
+          $content[$bundle]['machinename'] = $bundle;
+          // get the public name
+          $content[$bundle]['publicname'] = $nodes[$bundle]['label'];
 
-          $field_info = field_info_instance('node', $field, $bundle);
-          $content[$bundle][$field]['name'] = $field;
-          $content[$bundle][$field]['label'] = $field_info['label'];   
-          $content[$bundle][$field]['options'] =  _park_map_get_field_options($field_info['widget']['type'], $field);
+          // get the fields:
+          $bundle_fields = variable_get_value('park_map_fields_' .  $bundle);
+
+          foreach ($bundle_fields as $field) {
+            
+            if($field) {          
+
+              $field_info = field_info_instance('node', $field, $bundle);
+              $content[$bundle][$field]['name'] = $field;
+              $content[$bundle][$field]['label'] = $field_info['label'];   
+              $content[$bundle][$field]['options'] =  _park_map_get_field_options($field_info['widget']['type'], $field);
+            }
+          }
         }
       }
     }
-  }
-}
 
+    cache_set('park-map:options', $content);
+
+  }else {
+    $content = $contents->data;
+  }
   return $content;
 }
-
 
 
 /**
@@ -221,11 +230,38 @@ function _park_map_get_field_list_options($fieldname) {
 function _park_map_get_field_tag($fieldname){
 
   $field = field_info_field($fieldname);
-  //dpm($field);
 
-  return NULL;
+//  return NULL;
 
+}
 
+/**
+ * @name
+ * _park_map_first_load_data()
+ * @return
+ * NULL if there is nothing selected, an array of elements if there are something selected.
+ */
+function _park_map_first_load_data() {
 
+  global $language;
 
+  $types = variable_get_value('park_map_first_load_bundles');
+
+  $quantity = variable_get_value('park_map_first_load_quantity');
+
+  if (!is_array($types) || !$types || !is_numeric($quantity) ) {
+    watchdog(WATCHDOG_PARK_MAP_TYPE, 'Park map first load is not ok, please check de the form', $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);
+
+    return NULL;
+  }
+
+  $query = db_select('node', 'node')
+    ->fields('node', array('nid'))
+    ->condition('language', $language->language, '=')
+    ->condition('type', $types, 'IN')
+    ->range(0,$quantity)
+    ->execute()
+    ->fetchAssoc();
+
+    $entitys = node_load_multiple($query); 
 }

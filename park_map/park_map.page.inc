@@ -10,18 +10,18 @@
  */
 function print_park_map() {
 
+  //$values = new stdClass;
   $values = new stdClass;
-
   // get the image path
   $values->image_absolute_path = _park_map_load_image_map_url();
   
   // get the geolocation values:
   $values->geolocation  =  _park_map_load_map_geolocation();
 
+  $values->first_load = _park_map_first_load_data();
+
   // get all the cotent types and all the fields from every content type.
   $values->contents =  _park_map_load_content_options();
-
-
 
   drupal_add_js( array('park_map' => $values), 'setting');
 

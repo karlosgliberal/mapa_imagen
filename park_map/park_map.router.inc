@@ -43,6 +43,15 @@ function park_map_menu() {
     'type' => MENU_LOCAL_TASK    
   );  
 
+  $items['admin/config/system/park_configuration/first_load'] = array(
+    'title' => 'Park Map first load',
+    'description' => 'Select the elements to load in the first visit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('variable_group_form', 'park_map_first_load'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK    
+  );  
+
   $items['park_map'] = array(
     'title' => 'Park Map',
     'page callback' => 'print_park_map',

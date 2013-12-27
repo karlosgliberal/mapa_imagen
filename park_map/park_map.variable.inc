@@ -30,7 +30,6 @@ function park_map_variable_info($options) {
     'required' => FALSE,
     'group' => 'park_map_options',
     'localize' => TRUE,
-
   );
 
 
@@ -64,45 +63,68 @@ function park_map_variable_info($options) {
     'group' => 'park_map_configuration',
   );
 
+
+///////////////////////////////////////  Content type and Fields options configuration  /////////////////////////////////////////////////
 // configurations of field by content type.
 // I use the default variable_get because there is not way to use variable_get_value into  hook_variable_info()
-$types =  variable_get('park_map_bundle', NULL);
+$bundles =  variable_get('park_map_bundle', NULL);
 
-// validate if there are elementes selecteds
-$there_is_bundles = _park_map_bundles_selected($types);
+// Here we have all the bundles-types that they are selected
+$types = _park_map_bundles_selected($bundles);
 
 // if there are bundles selected go on with the fields.
-if($there_is_bundles) {
+if($types) {
 
   foreach ($types as $type) {
 
-    if($type || $type !=NULL){
+    unset($fields_bundle);
+    unset($field_list);
 
-      unset($fields_bundle);
-      unset($field_list);
+    $fields_bundle =  field_info_instances('node', $type);
+    $field_list = array();
 
-      $fields_bundle =  field_info_instances('node', $type);
-      $field_list = array();
-
-      foreach ($fields_bundle as $field) {
-        $field_list[$field['field_name']] = $field['label'];
-      }
-
-
-      $variables['park_map_fields_' . $type ] = array(
-        'type' => 'options',
-        'title' => t('Select the fields of ' . $type, array(), $options),
-        'options' => $field_list,
-        // 'default' => '',
-        'description' => t('Choose the node types to use in the interactive map.', array(), $options),
-        'required' => FALSE,
-        'group' => 'park_map_options',
-        'localize' => TRUE,
-      );
+    foreach ($fields_bundle as $field) {
+      $field_list[$field['field_name']] = $field['label'];
     }
+
+
+    $variables['park_map_fields_' . $type ] = array(
+      'type' => 'options',
+      'title' => t('Select the fields of ' . $type, array(), $options),
+      'options' => $field_list,
+      // 'default' => '',
+      'description' => t('Choose the node types to use in the interactive map.', array(), $options),
+      'required' => FALSE,
+      'group' => 'park_map_options',
+      'localize' => TRUE,
+    );  
   }
 } 
 
+
+//////////////////////////First Load /////////////////////////////////////
+// Choose the content type and the the quantity of date to print in the first load.
+  $variables['park_map_first_load_bundles'] = array(
+    'type' => 'options',
+    'title' => t('Select the node bundles to load', array(), $options),
+    'options' => $list_bundles,
+    // 'default' => '',
+    'description' => t('Choose the node types to load in the first load of the map.', array(), $options),
+    'required' => FALSE,
+    'group' => 'park_map_first_load',
+    'localize' => TRUE,
+  );
+
+  $variables['park_map_first_load_quantity'] = array(
+    'type' => 'number',
+    'title' => t('quantity.', array(), $options),
+    //'options' => $list_bundles,
+    'default' => 0,
+    'description' => t('Select the quantity of content to load in the first load of the map.', array(), $options),
+    'required' => FALSE,
+    'group' => 'park_map_first_load',
+    'localize' => TRUE,
+  );
 
 return $variables;
 }
@@ -128,6 +150,12 @@ function park_map_varaible_group_info() {
     'path' => array('admin/config/park/park_configuration/options'),
   );
 
+  $groups['park_map_first_load'] = array (
+    'title' => t('Park map first load'),
+    'descripcion' => t('Park map configure first load'),
+    'access' => 'administer configuration',
+    'path' => array('admin/config/park/park_configuration/first_load'),
+  );
 
   return $groups;
 }

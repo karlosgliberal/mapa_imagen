@@ -8,10 +8,55 @@ module_load_include('inc','park_map','park_map.admin');
 module_load_include('inc','park_map','park_map.variable');
 //module_load_include('inc','park_map','park_map.class');
 
+//Custom watchdog type to check all the elements of the module.
+define('WATCHDOG_PARK_MAP_TYPE', 'Park map');
 
+/**
+ * Cache bin names
+ * @name
+ * park:map-image This bin hold the image path
+ * @name
+ * park:map-positions  This bin hold the the SouthWest  and NorthEast lattong to fix the image in the real world.
+ * @name
+ * park:map-options This bin hold the content type, the fields of the content types and the options of the fields to print the selectors in the map.
+ */
 
 /**
  * @file
  *
  * this is the drupal module file, it will have all the required hooks.
  */
+
+
+
+/**
+ * Implement hook_form_alter().
+ */
+function park_map_form_alter(&$form, &$form_state, $form_id){
+
+  if($form_id == 'variable_group_form') {
+    $form['#submit'][] = '_park_map_variable_group_form_form_submit';
+  }
+}
+
+
+function _park_map_variable_group_form_form_submit($form, &$form_state){
+
+  $id = $form['#variable_group_form'];
+
+  switch ($id) {
+    case 'park_map_options':
+      // Here we select the content types and the fields.
+      cache_clear_all('park-map:image', 'cache', TRUE);
+      cache_clear_all('park-map:positions','cache', TRUE);
+
+    break;
+    
+    case 'park_map_configuration':
+      // Here we define the image map and the coordinates.
+      cache_clear_all('park-map:options','cache', TRUE);  
+    break;
+  }
+
+  watchdog(WATCHDOG_PARK_MAP_TYPE, t('The %name cache bin has been cleared', array('%name' => $id)), $variables = array(), WATCHDOG_INFO, NULL);
+}

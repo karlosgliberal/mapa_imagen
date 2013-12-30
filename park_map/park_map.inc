@@ -245,23 +245,52 @@ function _park_map_first_load_data() {
 
   global $language;
 
-  $types = variable_get_value('park_map_first_load_bundles');
+  $contents = cache_get('park-map-' . $language->language . ':firsload');
 
-  $quantity = variable_get_value('park_map_first_load_quantity');
+  $contents = null;
 
-  if (!is_array($types) || !$types || !is_numeric($quantity) ) {
-    watchdog(WATCHDOG_PARK_MAP_TYPE, 'Park map first load is not ok, please check de the form', $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);
+ if(!$contents){
 
-    return NULL;
+    $types = variable_get_value('park_map_first_load_bundles');
+
+    $quantity = variable_get_value('park_map_first_load_quantity');
+
+    if (!is_array($types) || !$types || !is_numeric($quantity) ) {
+      watchdog(WATCHDOG_PARK_MAP_TYPE, 'Park map first load is not ok, please check de the form', $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);
+
+      return NULL;
+    }
+
+    $query = db_select('node', 'node')
+      ->fields('node', array('nid'))
+      ->condition('language', $language->language, '=')
+      ->condition('type', $types, 'IN')
+      ->range(0, $quantity);
+      $records = $query->execute();
+      
+      $result = array();
+      foreach ($records as $record) {
+        $result [] = $record->nid;
+      }
+ 
+     $entitys = node_load_multiple($result); 
+      
+ 
+    if($entitys) {
+
+      cache_set('park-map-' . $language->language . ':firsload', $entitys);
+
+      return $entitys;
+
+    } else {
+       watchdog(WATCHDOG_PARK_MAP_TYPE, 'Park map first load is not ok, the query give back nothing.', $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);      
+
+       return NULL;
+     }
+     
+   
+  }    else {
+
+    return $contents->data;
   }
-
-  $query = db_select('node', 'node')
-    ->fields('node', array('nid'))
-    ->condition('language', $language->language, '=')
-    ->condition('type', $types, 'IN')
-    ->range(0,$quantity)
-    ->execute()
-    ->fetchAssoc();
-
-    $entitys = node_load_multiple($query); 
 }

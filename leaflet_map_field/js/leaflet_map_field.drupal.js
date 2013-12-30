@@ -3,10 +3,8 @@
   Drupal.behaviors.leafletMapField = {
     attach:function (context, settings) {
 
-
     var latitude = Drupal.settings.leaflet_map_field.lat; 
     var longitude = Drupal.settings.leaflet_map_field.lon;
-
 
     var map = L.map('field_map', {maxZoom: 17}).setView([51.495, -0.075], 14);
     var marker;

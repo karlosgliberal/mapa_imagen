@@ -16,28 +16,28 @@ function print_park_map() {
   // get the image path
   $image_absolute_path = _park_map_load_image_map_url();
   
-  if($image_absolute_path){
+  if(isset($image_absolute_path)){
     $values->image_absolute_path =  $image_absolute_path;
   }
   
   // get the geolocation values:
   $park_map_load_map_geolocation = _park_map_load_map_geolocation();
 
-  if($park_map_load_map_geolocation){
+  if(isset($park_map_load_map_geolocation)){
     $values->geolocation  =  $park_map_load_map_geolocation;
   }
 
   // get the firs load.
   $park_map_first_load_data = _park_map_first_load_data();
   
-  if($park_map_first_load_data){
+  if(isset($park_map_first_load_data)){
     $values->first_load = $park_map_first_load_data;
   }
 
   // get all the cotent types and all the fields from every content type.
   $park_map_load_content_options = _park_map_load_content_options();
 
-  if($park_map_load_content_options){
+  if(isset($park_map_load_content_options)){
     $values->contents =  $park_map_load_content_options;
   }
 

@@ -26,11 +26,13 @@ function park_map_theme() {
 
 function template_preprocess_render_park_map(&$variables) {
 
+
+/*
   $variables['park_map_path'] = $variables[0]->image_absolute_path;
 
   // Generamos variables por latitudes/longitudes
   foreach ( $variables[0]->geolocation as $key => $value) {
     $variables[$key] = $value;  
   }
-
+*/
 }

@@ -52,74 +52,78 @@ function print_park_map() {
  */
 function query_park_map() {
 
-$arguments = preg_split('/&/',  $_SERVER ['QUERY_STRING']);
+$value = _park_map_url_parser($_SERVER ['QUERY_STRING']);
 
-foreach ($arguments as $argument) {
-  $element = preg_split('/=/', $argument);
-  $value[$element[0]] = $element[1];
- 
-}
+  if(!is_array($value) ||  !$value['lang']) {
 
-print_r($value);
-
-  try{
-
-  if(!is_array($value)) {
-
-    throw new Exception("Error Processing Request", 1);
-    
-  }else {
-    // comprobamos que esta la variable de idioma y de tipos de contenido.sino esta no hacemos nada.
-    if(!$value['lang']  || !$values['contenttype']) {
-
-      $response = array(
-        'status' => 400,
-        'data' => 'Bad Request',
-      );
-      
+    $response = array(
+      'status' => 400,
+      'data' => 'Bad Request',
+    );  
       return $response;
-
-    } else {
-      // montamos la query.
-      $query = db_select('node', 'n');
-      $query->condition('status', 1, '=');
-      $query->condition('n.language', $value['lang'], '=');
-
-      $db_or = db_or(); 
-      foreach ($contenttypes as $contenttype) {
-        $db_or->condition('n.type', $value, '=');
-      }
-      $query->condition($db_or);
-
-
     }
-    
+
+  // montamos la query. básica
+  $query = db_select('node', 'n');
+  $query->condition('status', 1, '=');
+  $query->condition('n.language', $value['lang'], '=');
+
+  //quitamos el elemento de idioma para recorrer los fields.
+  unset($value['lang']);
+
+  foreach ($value as $field => $value) {
+    $fieldtable = 'field_data_' . $field;
+    $fieldvalue = $field . '_value';
+    $fieldrelation = $field . ' .entity_id = node.nid';
+    $fieldcondition = $field . '.' . $field_value;
+    $query->leftJoin($fieldtable, $field, $fieldrelation);
+
+    $query->condition($fieldcondition, $value, '=');
   }
+
+
+/*
+select node.title, node.nid from node node
+
+inner join field_data_field_listado_de_elementos field_data_field_listado_de_elementos 
+  ON (field_data_field_listado_de_elementos.entity_id = node.nid)
+
+where node.language = 'en' 
+and node.status = 1 
+
+
+and field_data_field_listado_de_elementos.field_listado_de_elementos_value IN (1,2,3)
+
+*/
+
+    /*
+   $db_or = db_or(); 
+   foreach ($value as $field => $elements) {
+    $db_or->condition('n.type', $value, '=');
+   }
   
+   $query->condition($db_or);
+   */
+   $data = 'god response';
 
-
-  } catch( Exception $e) {
-
-    drupal_set_message(t('No se han recibido los valores bien en la petición'), 'error');
-
-  }
+    
+    
 //print drupal_json_output (
 
-$data =  array (   'test'=>true,   'dummy'=>array(0,1),  'url' => $_SERVER['REQUEST_URI']);
-
+/*
   $response = array(
     'status' => 1,
     'data' => $data,
   );
- 
-  return drupal_json_output($response);
+   */
+  return 'hola mundo';
 }
 
 /**
  *
  */
 function query_park_map_delivery_callback($page_callback_result) {
-  print $page_callback_result;
+  print  $page_callback_result;
   ajax_footer();
 }
 

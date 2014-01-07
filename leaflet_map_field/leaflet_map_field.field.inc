@@ -124,13 +124,13 @@ function leaflet_map_field_field_widget_info() {
  */
 function leaflet_map_field_field_settings_form($field, $instance, $has_data) {
 
-  // dpm($field);
+  //dpm($field);
 
   $form[$field['field_name']] = array(
     '#title' => t('Default map image'),
     '#description' => t('Add the default image/map for this field instance'),
     '#type' => 'managed_file',
-    '#default_value' => ($field['settings']) ? $field['settings'][$field['field_name']] :  '' ,
+    '#default_value' => ($field['settings'][$field['field_name']]) ? $field['settings'][$field['field_name']] :  '' ,
     '#upload_location' => 'public://multipurpose_field_images/',
   );
 

@@ -52,7 +52,8 @@ function print_park_map() {
  */
 function query_park_map() {
 
-$value = _park_map_url_parser($_SERVER ['QUERY_STRING']);
+  $value = _park_map_url_parser($_SERVER ['QUERY_STRING']);
+
 
   if(!is_array($value) ||  !$value['lang']) {
 
@@ -60,70 +61,72 @@ $value = _park_map_url_parser($_SERVER ['QUERY_STRING']);
       'status' => 400,
       'data' => 'Bad Request',
     );  
-      return $response;
-    }
+
+    return $response;
+  }
 
   // montamos la query. básica
-  $query = db_select('node', 'n');
+  $query = db_select('node', 'node');
   $query->condition('status', 1, '=');
-  $query->condition('n.language', $value['lang'], '=');
+  $query->condition('node.language', $value['lang'], '=');
+  $query->fields('node', array('title','nid'));
+
+  //imagen field_data_field_image
+  $query->leftJoin('field_data_field_image', 'field_image','field_image.entity_id = node.nid');
+  $query->fields('field_image', array('field_image_fid'));
+
 
   //quitamos el elemento de idioma para recorrer los fields.
   unset($value['lang']);
 
   foreach ($value as $field => $value) {
+
+    $infofield = field_info_field($field);
+
+    if($infofield['type'] = 'taxonomy_term_type'){
+      $fieldvalue = $field . '_tid';  
+    }else {
+      $fieldvalue = $field . '_value';
+    }
+
     $fieldtable = 'field_data_' . $field;
-    $fieldvalue = $field . '_value';
     $fieldrelation = $field . ' .entity_id = node.nid';
-    $fieldcondition = $field . '.' . $field_value;
+    $fieldcondition = $field . '.' . $fieldvalue;
     $query->leftJoin($fieldtable, $field, $fieldrelation);
 
     $query->condition($fieldcondition, $value, '=');
   }
 
+  $result = $query->execute();
 
-/*
-select node.title, node.nid from node node
-
-inner join field_data_field_listado_de_elementos field_data_field_listado_de_elementos 
-  ON (field_data_field_listado_de_elementos.entity_id = node.nid)
-
-where node.language = 'en' 
-and node.status = 1 
-
-
-and field_data_field_listado_de_elementos.field_listado_de_elementos_value IN (1,2,3)
-
-*/
-
-    /*
-   $db_or = db_or(); 
-   foreach ($value as $field => $elements) {
-    $db_or->condition('n.type', $value, '=');
-   }
   
-   $query->condition($db_or);
-   */
-   $data = 'god response';
+  
+  //degug
+  dpq($query); # using devel
+  print_r($query->__toString());
+  
 
+  $response = array();
+  $response['status'] = 200;
+  foreach ($result as $key => $record) {
     
-    
-//print drupal_json_output (
 
-/*
-  $response = array(
-    'status' => 1,
-    'data' => $data,
-  );
-   */
-  return 'hola mundo';
+
+    $response['data'][$key]['nid'] = $record->nid;
+    $response['data'][$key]['title'] = $record->title;
+    $response['data'][$key]['image'] = _park_map_get_image_path($record->field_image_fid,'thumbnail');
+    }
+
+dpm($response);
+
+  return 'hola mundo';// $response;
 }
 
 /**
  *
  */
 function query_park_map_delivery_callback($page_callback_result) {
-  print  $page_callback_result;
+ drupal_json_output ( $page_callback_result);
   ajax_footer();
 }
 

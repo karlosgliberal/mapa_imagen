@@ -66,7 +66,8 @@ function park_map_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'park_map.page.inc',
     'file path' => drupal_get_path('module','park_map'),
- //   'delivery callback' => 'query_park_map_delivery_callback' ,
+   // 'delivery callback' => 'query_park_map_delivery_callback' ,
+    // revisar por si se puede implementar.
     // https://gist.github.com/pascalduez/1517190
   );
 

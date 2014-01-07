@@ -295,6 +295,7 @@ function _park_map_first_load_data() {
   }
 }
 
+
 /**
  * @name
  * _park_map_url_parser
@@ -307,22 +308,49 @@ function _park_map_first_load_data() {
  */
 function _park_map_url_parser($value) {
 
-if(!is_string($value)){
-  watchdog(WATCHDOG_PARK_MAP_TYPE, 'Park map url parser value is not an string.', $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);      
-  return NULL;
+  if(!is_string($value)){
+    watchdog(WATCHDOG_PARK_MAP_TYPE, 'Park map url parser value is not an string.', $variables = array(), $severity = WATCHDOG_NOTICE, $link = NULL);      
+    return NULL;
+  }
+
+  $arguments = explode('&',$value);
+
+  $return = array();
+  foreach($arguments as $argument){
+
+    $data = explode('=', $argument);
+    $return[$data[0]] = $data[1];
+
+  }
+
+  return $return;
 }
 
-$arguments = explode('&',$value);
 
-$return = array();
-foreach($arguments as $argument){
+/**
+ * @name
+ * _park_map_get_image_path
+ * 
+ * @var
+ * $fid, the fid
+ * $style, the preset name
+ *
+ * @return
+ * string with the path of the image.
+ */
 
-  $data = explode('=', $argument);
-  $return[$data[0]] = $data[1];
+function _park_map_get_image_path($fid, $style) {
 
-}
+  if(!is_numeric($fid)) {
+    return NULL;
+  }
 
-return $return;
+  if( empty($fid) || empty($style) ) {
+    return NULL;
+  }
+
+  $imgpath = file_load($fid)->uri;
 
 
+  return image_style_url($style, $imgpath);
 }

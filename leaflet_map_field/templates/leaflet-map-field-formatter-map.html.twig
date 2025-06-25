@@ -1,0 +1,20 @@
+{#
+/**
+ * @file
+ * Default theme implementation for displaying a Leaflet map from the formatter.
+ *
+ * Available variables:
+ * - map_id: The unique ID for the map div.
+ * - map_width: The width of the map container.
+ * - map_height: The height of the map container.
+ * - attributes: HTML attributes for the wrapper. (Drupal adds this by default)
+ *
+ * @see leaflet_map_field_theme()
+ * @see \Drupal\leaflet_map_field\Plugin\Field\FieldFormatter\LeafletCoordinatesFormatter::viewElements()
+ */
+#}
+<div id="{{ map_id }}" class="leaflet-map-field-formatter-display" style="width: {{ map_width }}; height: {{ map_height }}; position: relative;">
+  {# This div will be targeted by JavaScript (leaflet_map_field.drupal.js) to render the map. #}
+  {# All necessary data (coordinates, image URL, zoom, etc.) is passed via drupalSettings #}
+  {# associated with this map_id in LeafletCoordinatesFormatter.php #}
+</div>

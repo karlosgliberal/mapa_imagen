@@ -1,0 +1,20 @@
+{#
+/**
+ * @file
+ * Default theme implementation for the map display.
+ *
+ * Available variables:
+ * - datos_mapa: An object containing map data (passed from controller).
+ *   - datos_mapa.mapa: Map field data (structure to be defined by field type).
+ *   - datos_mapa.img: Image file URI or URL.
+ * - attributes: HTML attributes for the wrapper.
+ *
+ * @see interzonas_theme()
+ * @see \Drupal\interzonas\Controller\MapaController::mapaPage()
+ */
+#}
+<div id="mapa" style="width: 700px; height: 500px; position: relative;">
+  {# The Leaflet map will be initialized here by JavaScript. #}
+  {# You can pass data from datos_mapa to JavaScript via drupalSettings #}
+  {# if needed, or use attributes on this div.                       #}
+</div>

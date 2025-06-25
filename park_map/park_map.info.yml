@@ -1,0 +1,19 @@
+name: 'Park map'
+description: 'Interactive park map.'
+type: module
+core_version_requirement: ^8 || ^9 || ^10
+package: Custom # Or whatever is appropriate
+
+dependencies:
+  # The 'variable' module is a D7 module. Its functionality needs to be replaced
+  # by Drupal 10's Configuration System. Direct dependency removed.
+  # - variable:variable
+  - leaflet:leaflet # Assuming the Leaflet module provides the Leaflet library
+
+# D7 'scripts[]' is replaced by libraries. This will be defined in park_map.libraries.yml
+# configure: admin/config/system/park_configuration # This will be defined via routing and menu links.
+
+# If the module has its own configuration that should be exported/imported:
+# config_devel: # Not a standard key, but indicates it has config.
+#   install:
+#     - park_map.settings # Example if settings are stored in park_map.settings.yml

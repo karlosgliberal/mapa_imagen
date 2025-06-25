@@ -1,0 +1,5 @@
+name: interzonas
+description: 'Desarrollo gestión de mapas de imagenes'
+package: interzonas
+type: module
+core_version_requirement: ^8 || ^9 || ^10

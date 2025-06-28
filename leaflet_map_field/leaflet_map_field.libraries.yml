@@ -1,0 +1,35 @@
+# Library for the Leaflet Coordinates field widget.
+leaflet-map-field-widget:
+  js:
+    js/leaflet_map_field.drupal.js: {}
+  css:
+    theme:
+      # Add any custom CSS for the widget if needed. Example:
+      # css/leaflet_map_field_widget.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/jquery.once # For using .once()
+    - leaflet/leaflet # Dependency on the main Leaflet module's library
+
+# Library for the Leaflet Coordinates field formatter.
+# This might use a different JS file or the same one if it can handle both modes.
+# For now, assuming it might need its own or share the widget's JS.
+# If it shares, the JS needs to be intelligent enough to distinguish widget from formatter.
+leaflet-map-field-formatter:
+  js:
+    # Option 1: Use the same JS as the widget
+    js/leaflet_map_field.drupal.js: {}
+    # Option 2: Use a dedicated JS file for the formatter if behavior is very different
+    # js/leaflet_map_field_formatter.drupal.js: {}
+  css:
+    theme:
+      # Add any custom CSS for the formatter if needed. Example:
+      # css/leaflet_map_field_formatter.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/jquery.once
+    - leaflet/leaflet

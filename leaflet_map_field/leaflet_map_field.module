@@ -2,38 +2,28 @@
 
 /**
  * @file 
- *
- * Standar drupal module to load all the files, and the print the required hooks.
+ * Main module file for the Leaflet Map Field module.
  */
-
-// Router file  holds the hook_menu, hook_permissions, and *_path_* hooks
-// module_load_include('inc','interactive_map_field','interactive_map_field.router');
-
-// field file holds all the required hooks to build fields.
-module_load_include('inc','leaflet_map_field','leaflet_map_field.field');
-
-// inc file holds all the new functions.
-module_load_include('inc','leaflet_map_field','leaflet_map_field');
-
-// theme file holds all the required hoos to theming elements
-module_load_include('inc','leaflet_map_field','leaflet_map_field.theme');
-
-
 
 /**
- * Implement Hook_page_alter().
+ * Implements hook_theme().
  */
-function leaflet_map_field_page_alter(&$page) {
-
-  // load leaflet library and css.
-  if (($library = libraries_load('leaflet')) && !empty($library['loaded'])) {
-    libraries_load('leaflet');
-  }
-
-  $path = $library['library path']. '/leaflet.css';
-  
-  if(file_exists($path)) {
-
-    drupal_add_css($path, array('group' => CSS_DEFAULT, 'every_page' => TRUE));
-  }
+function leaflet_map_field_theme($existing, $type, $theme, $path) {
+  return [
+    'leaflet_map_field_formatter_map' => [
+      'variables' => [
+        'map_id' => NULL,
+        'map_width' => '100%',
+        'map_height' => '400px',
+        // Any other variables needed by the Twig template for the formatter.
+      ],
+      'template' => 'leaflet-map-field-formatter-map', // Will look for templates/leaflet-map-field-formatter-map.html.twig
+    ],
+  ];
 }
+
+// Removed module_load_include calls. PSR-4 autoloading handles class loading.
+// Removed hook_page_alter(). CSS/JS are managed via libraries and dependencies.
+// Functionality from .inc files (field, theme, general) has been moved into
+// respective D10 plugins (FieldType, FieldWidget, FieldFormatter), Twig templates,
+// or this .module file.

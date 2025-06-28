@@ -1,0 +1,9 @@
+interzonas.mapa:
+  path: '/mapa'
+  defaults:
+    _controller: '\Drupal\interzonas\Controller\MapaController::mapaPage'
+    _title: 'Mapa'
+  requirements:
+    _access: 'TRUE' # In D10, this should ideally be a permission string like _permission: 'access content'
+                     # For now, keeping it TRUE to match original 'access callback' => TRUE behavior.
+                     # This will need review for proper D10 access control.

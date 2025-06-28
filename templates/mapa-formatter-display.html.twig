@@ -1,0 +1,23 @@
+{#
+/**
+ * @file
+ * Default theme implementation for displaying a 'campo_mapa' field.
+ *
+ * Available variables:
+ * - map_id: The unique ID for the map div.
+ * - map_value: The stored value of the map field.
+ * - default_image_url: URL of the default map image, if configured.
+ *
+ * @see \Drupal\interzonas\Plugin\Field\FieldFormatter\MapaFormatter::viewElements()
+ * @see interzonas_theme()
+ */
+#}
+<div id="{{ map_id }}" class="interzonas-map-formatter-display" style="width: 100%; height: 400px; position: relative;">
+  {# This div will be targeted by JavaScript to render the map. #}
+  {# Information like map_value and default_image_url are passed via drupalSettings #}
+  {# and can be used by the JS to initialize the map display.                     #}
+  {% if default_image_url and not map_value %}
+    <img src="{{ default_image_url }}" alt="{{ 'Default map background'|t }}" style="width:100%; height:100%; object-fit: cover;" />
+  {% endif %}
+  {# If map_value is present, JavaScript should handle rendering the map, possibly overlaying the default image or replacing it. #}
+</div>

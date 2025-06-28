@@ -1,0 +1,55 @@
+leaflet:
+  remote: https://unpkg.com/leaflet@1.7.1/dist/leaflet.js # Using a CDN for simplicity, can be locally hosted
+  version: 1.7.1
+  license:
+    name: BSD-2-Clause
+    url: https://github.com/Leaflet/Leaflet/blob/main/LICENSE
+    gpl-compatible: true
+  css:
+    theme:
+      https://unpkg.com/leaflet@1.7.1/dist/leaflet.css: { type: external, minified: true }
+  js:
+    # The remote JS is already specified above.
+    # If hosting locally, it would be:
+    # js/leaflet/leaflet.js: {}
+
+# General JavaScript for the interzonas module (e.g., for the /mapa page)
+interzonas-js:
+  js:
+    interzonas.drupal.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery # If jQuery is used in interzonas.drupal.js
+    - core/drupalSettings
+    - interzonas/leaflet # Depends on leaflet
+
+# JavaScript specific to the interzonas map field widget
+interzonas-field-js:
+  js:
+    interzonas_field.drupal.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery # If jQuery is used
+    - core/drupalSettings
+    - interzonas/leaflet # Depends on leaflet
+
+# Placeholder for any custom CSS for the module (if needed beyond leaflet)
+interzonas-styles:
+  css:
+    theme:
+      # Example: css/interzonas.css: {}
+      # For now, we know leaflet.css is primary, which is in the leaflet library definition.
+      # If leaflet is hosted locally, its CSS would be:
+      leaflet/leaflet.css: {}
+
+# Library for the main map page, combining leaflet and interzonas custom JS
+map-page-library:
+  dependencies:
+    - interzonas/leaflet
+    - interzonas/interzonas-js
+    - interzonas/interzonas-styles # if custom styles are added beyond leaflet's own css
+  js:
+    # interzonas.drupal.js is already included via interzonas-js dependency
+  css:
+    # leaflet.css is already included via leaflet dependency
+    # Any additional CSS for the map page itself could be listed here.

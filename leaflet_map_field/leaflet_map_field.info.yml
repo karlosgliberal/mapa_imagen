@@ -1,0 +1,9 @@
+name: 'Leaflet map field'
+description: 'Provides a field type to store coordinates or pixel data from a Leaflet map layer.'
+type: module
+core_version_requirement: ^8 || ^9 || ^10
+package: Fields
+dependencies:
+  - drupal:field_ui
+  - leaflet:leaflet # Assuming the machine name of the Leaflet module is 'leaflet'
+                    # This dependency will ensure the Leaflet library (JS/CSS) is available.
